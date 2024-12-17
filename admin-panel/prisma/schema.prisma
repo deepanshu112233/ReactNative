@@ -1,0 +1,37 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // or sqlite, mysql
+  url      = env("DATABASE_URL")
+  
+
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  username String   @unique
+  clerkId  String   @unique
+  email    String   @unique
+  wallet   Wallet[]
+}
+
+model Wallet {
+  id           Int           @id @default(autoincrement())
+  userId       Int           
+  balance      Float         @default(0)
+  transactions Transaction[]
+  user         User          @relation(fields: [userId], references: [id])
+}
+
+model Transaction {
+  id        Int     @id @default(autoincrement())
+  walletId  Int
+  type      String  // "send" or "receive"
+  amount    Float
+  category  String  // "savings", "food", "salary", etc.
+  createdAt DateTime @default(now())
+
+  wallet    Wallet  @relation(fields: [walletId], references: [id])
+}
